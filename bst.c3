@@ -26,14 +26,11 @@ fn BSTNode* init(Type value, BSTNode* parent) {
 
 fn BSTNode* search(BSTNode* root, Type value) {
     BSTNode* current = root;
-    while (current) {
-        if (value == current.value) return current;
-        
-        if (value < current.value){
-        current = current.left;
-        }
-        else {
-        current = current.right;
+    while(current) {
+        switch {
+            case value == current.value: return current;
+            case value < current.value: current = current.left;
+            default: current = current.right;
         }
     }
     return null;
