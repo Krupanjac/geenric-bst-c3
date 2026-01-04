@@ -49,7 +49,7 @@ fn BSTNode* insert(BSTNode* root, Type value) {
     BSTNode* parent = null;
     while (current) {
         parent = current;
-        if (value < current.value) {
+if (value < current.value) {
             current = current.left;
         } else {
             current = current.right;
@@ -157,12 +157,26 @@ fn BSTNode* freeBST(BSTNode* node) {
         return null;
     }
     while(node){
-        delete(node, node.value);
+        node = delete(node, node.value);
     }
     return node;
 }
 
+fn BSTNode* minValueNode(BSTNode* node) {
+    BSTNode* current = node;
+    while (current && current.left) {
+        current = current.left;
+    }
+    return current;
+}
 
+fn BSTNode* maxValueNode(BSTNode* node) {
+    BSTNode* current = node;
+    while (current && current.right) {
+        current = current.right;
+    }
+    return current;
+}
 
 fn void inorderTraversal(BSTNode* node) {
     if (node == null) {
