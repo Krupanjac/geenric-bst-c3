@@ -2,7 +2,6 @@ module bst @generic(Type);
 import std::io;
 
 
-
 struct BSTNode {
     Type value;
     BSTNode* left;
@@ -66,3 +65,110 @@ fn BSTNode* insert(BSTNode* root, Type value) {
 }
 
 
+fn BSTNode* successor(BSTNode* node) {
+    if (!node) {
+        return null;
+    }
+    // If right subtree exists, go to leftmost node in right subtree
+    if (node.right) {
+        BSTNode* current = node.right;
+        while (current.left) {
+            current = current.left;
+        }
+        return current;
+    }
+    // Otherwise, go up until we find a node that is left child of its parent
+    BSTNode* current = node;
+    BSTNode* parent = node.parent;
+    while (parent && current == parent.right) {
+        current = parent;
+        parent = parent.parent;
+    }
+    return parent;
+}
+
+
+fn BSTNode* delete(BSTNode* node, Type value) {
+    if (!node) return null;
+
+    BSTNode* target = search(node, value);
+    if (!target) {
+        io::printn("Value not found in the BST.");
+        return node;
+    }
+
+    // Case 1: leaf
+    if (!target.left && !target.right) {
+        if (target.parent) {
+            switch{
+                case (target == target.parent.left):
+                target.parent.left = null;
+            default: 
+                target.parent.right = null;
+                }
+        } else {
+            node = null;
+        }
+        free(target);
+    }
+
+    // Case 2: one child
+    else if (!target.left || !target.right) {
+        BSTNode* child = target.left ? target.left : target.right;
+
+        if (target.parent) {
+            switch{
+                case (target == target.parent.left):
+                target.parent.left = child;
+                default:
+                target.parent.right = child;
+            }
+        } else {
+            node = child;
+        }
+
+        child.parent = target.parent;
+        free(target);
+    }
+
+    // Case 3: two children
+    else {
+        BSTNode* succ = successor(target);
+        target.value = succ.value;
+
+        BSTNode* child = succ.right;
+        switch{
+            case (succ.parent.left == succ):
+            succ.parent.left = child;
+            default:
+            succ.parent.right = child;
+        }
+        if (child) child.parent = succ.parent;
+
+
+        free(succ);
+    }
+
+    return node;
+}
+
+fn BSTNode* freeBST(BSTNode* node) {
+    if (!node) {
+        return null;
+    }
+    while(node){
+        delete(node, node.value);
+    }
+    return node;
+}
+
+
+
+fn void inorderTraversal(BSTNode* node) {
+    if (node == null) {
+        return;
+    }
+    inorderTraversal(node.left);
+    io::printn(node.value);
+    inorderTraversal(node.right);
+}
